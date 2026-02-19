@@ -102,6 +102,10 @@ const styles = StyleSheet.create({
   skillItems: {
     color: GRAY,
   },
+  skillHighlight: {
+    fontWeight: "bold",
+    color: ACCENT,
+  },
 
   // Experience / Projects
   entryBlock: {
@@ -149,8 +153,9 @@ const styles = StyleSheet.create({
   },
 });
 
-const CVDocument = ({ profile, lang = "en" }) => {
+const CVDocument = ({ profile, lang = "en", matchedKeywords = [] }) => {
   const { basics, skills, work, projects, education } = profile;
+  const matchedSet = new Set(matchedKeywords.map((k) => k.toLowerCase()));
 
   return (
     <Document>
@@ -200,9 +205,20 @@ const CVDocument = ({ profile, lang = "en" }) => {
             {skills.map((group, i) => (
               <Text key={i} style={styles.skillRow}>
                 <Text style={styles.skillCategory}>{group.category}: </Text>
-                <Text style={styles.skillItems}>
-                  {group.items.map((item) => item.name).join(", ")}
-                </Text>
+                {group.items.map((item, j) => {
+                  const isMatched = matchedSet.has(item.name.toLowerCase());
+                  return (
+                    <Text
+                      key={j}
+                      style={
+                        isMatched ? styles.skillHighlight : styles.skillItems
+                      }
+                    >
+                      {item.name}
+                      {j < group.items.length - 1 ? ", " : ""}
+                    </Text>
+                  );
+                })}
               </Text>
             ))}
           </View>

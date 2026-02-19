@@ -25,7 +25,11 @@ export default function App() {
   const downloadPdf = useCallback(
     async (pdfLang) => {
       const blob = await pdf(
-        <CVDocument profile={targetedProfile} lang={pdfLang} />,
+        <CVDocument
+          profile={targetedProfile}
+          lang={pdfLang}
+          matchedKeywords={targetedProfile._matchedKeywords || []}
+        />,
       ).toBlob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -156,6 +160,7 @@ export default function App() {
             jobDescription={jobDescription}
             onJobDescriptionChange={setJobDescription}
             lang={lang}
+            matchedKeywords={targetedProfile._matchedKeywords || []}
           />
         </div>
 
@@ -166,7 +171,11 @@ export default function App() {
           </div>
           <div className="preview-viewer">
             <PDFViewer width="100%" height="100%" showToolbar={false}>
-              <CVDocument profile={targetedProfile} lang={lang} />
+              <CVDocument
+                profile={targetedProfile}
+                lang={lang}
+                matchedKeywords={targetedProfile._matchedKeywords || []}
+              />
             </PDFViewer>
           </div>
         </div>

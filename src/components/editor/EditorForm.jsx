@@ -36,8 +36,11 @@ function Field({ label, children }) {
 /* ─────────────────────────────────────────────
    Tag input (for skills / tech_stack)
    ───────────────────────────────────────────── */
-function TagInput({ tags, onChange, placeholder }) {
+function TagInput({ tags, onChange, placeholder, highlightedTags }) {
   const [input, setInput] = useState("");
+  const highlightSet = new Set(
+    (highlightedTags || []).map((t) => t.toLowerCase()),
+  );
 
   const addTag = () => {
     const val = input.trim();
@@ -54,18 +57,22 @@ function TagInput({ tags, onChange, placeholder }) {
   return (
     <div className="tag-input-wrapper">
       <div className="tags">
-        {tags.map((tag, i) => (
-          <span key={i} className="tag">
-            {tag}
-            <button
-              type="button"
-              className="tag-remove"
-              onClick={() => removeTag(i)}
-            >
-              ×
-            </button>
-          </span>
-        ))}
+        {tags.map((tag, i) => {
+          const isMatched = highlightSet.has(tag.toLowerCase());
+          return (
+            <span key={i} className={`tag ${isMatched ? "tag-matched" : ""}`}>
+              {isMatched && <span className="tag-match-icon">✓</span>}
+              {tag}
+              <button
+                type="button"
+                className="tag-remove"
+                onClick={() => removeTag(i)}
+              >
+                ×
+              </button>
+            </span>
+          );
+        })}
       </div>
       <div className="tag-add-row">
         <input
@@ -97,6 +104,7 @@ export default function EditorForm({
   jobDescription,
   onJobDescriptionChange,
   lang = "en",
+  matchedKeywords = [],
 }) {
   /* Helpers to update nested state */
   const set = (path, val) => {
@@ -257,6 +265,7 @@ export default function EditorForm({
             <TagInput
               tags={group.items.map((it) => it.name)}
               placeholder={t(lang, "addItem")}
+              highlightedTags={matchedKeywords}
               onChange={(tags) =>
                 set(
                   `skills.${gi}.items`,
